@@ -14,16 +14,20 @@ import json
 import re
 import sys
 from timeit import default_timer
+from distutils import spawn
 
 from browsermobproxy import Server
 from pyvirtualdisplay import Display
 from selenium import webdriver
 
 
-BROWSERMOB = './browsermob-proxy-2.0-beta-9'
+BROWSERMOB_DEFAULT = './browsermob-proxy-2.0-beta-9/bin/browsermob-proxy'
 
 VIRTUAL_DISPLAY_SIZE = (1024, 768)
 
+
+def set_browsermob_proxy_path():
+    return spawn.find_executable('browsermob-proxy') or BROWSERMOB_DEFAULT
 
 def slugify(text):
     pattern = re.compile(r'[^a-z0-9]+')
@@ -50,7 +54,7 @@ def parse_cmd_args():
 
 def create_hars(url):
     print 'starting browsermob proxy'
-    server = Server('{}/bin/browsermob-proxy'.format(BROWSERMOB))
+    server = Server(set_browsermob_proxy_path())
     server.start()
 
     proxy = server.create_proxy()
