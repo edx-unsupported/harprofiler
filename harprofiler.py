@@ -37,7 +37,7 @@ def save_har(har_name, har):
 
 def create_hars(urls, browsermob_dir, run_cached):
     for url in urls:
-        print 'starting browsermob proxy'
+        print '\n\tstarting browsermob proxy'
         server = Server('{}/bin/browsermob-proxy'.format(browsermob_dir))
         server.start()
 
@@ -49,27 +49,27 @@ def create_hars(urls, browsermob_dir, run_cached):
         url_slug = slugify(url)
         proxy.new_har(url_slug)
 
-        print 'loading page: {}'.format(url)
+        print '\tloading page: {}'.format(url)
         driver.get(url)
 
         har_name = '{}-{}.har'.format(url_slug, time.time())
-        print 'saving HAR file: {}'.format(har_name)
+        print '\tsaving HAR file: {}'.format(har_name)
         save_har(har_name, proxy.har)
 
         if run_cached:
             url_slug = '{}-cached'.format(slugify(url))
             proxy.new_har(url_slug)
 
-            print 'loading cached page: {}'.format(url)
+            print '\tloading cached page: {}'.format(url)
             driver.get(url)
 
             har_name = '{}-{}.har'.format(url_slug, time.time())
-            print 'saving HAR file: {}'.format(har_name)
+            print '\tsaving HAR file: {}'.format(har_name)
             save_har(har_name, proxy.har)
 
         driver.quit()
 
-        print 'stopping browsermob proxy'
+        print '\tstopping browsermob proxy'
         server.stop()
 
 
