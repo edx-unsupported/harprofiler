@@ -7,4 +7,4 @@ unzip -o bmp.zip
 rm bmp.zip
 virtualenv env
 source env/bin/activate
-pip install -r requirements.txt
+pip install -e .
