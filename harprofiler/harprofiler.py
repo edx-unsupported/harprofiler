@@ -87,7 +87,7 @@ class HarProfiler:
             har_name = self.cached_har_name
 
         log.info('saving HAR file: {}'.format(har_name))
-        with open(os.path.join(self.har_dir, har_name), 'w' ) as f:
+        with open(os.path.join(self.har_dir, har_name), 'w') as f:
             json.dump(har, f, indent=2, ensure_ascii=False)
 
     def load_page(self, url, run_cached=True):
@@ -111,8 +111,17 @@ class HarProfiler:
         return slug
 
 
+def load_config(config_file):
+    try:
+        return yaml.load(file(config_file))
+    except IOError:
+        this_dir = os.path.abspath(os.path.dirname(__file__))
+        default_config_file = os.path.join(this_dir, 'config.yaml')
+        return yaml.load(file(default_config_file))
+
+
 def main(config_file='config.yaml'):
-    config = yaml.load(file(config_file))
+    config = load_config(config_file)
 
     for url in config['urls']:
         with HarProfiler(config, url) as profiler:

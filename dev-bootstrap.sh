@@ -14,4 +14,4 @@ bash install-bmp.sh
 # Create virtualenv and install requirements
 virtualenv env
 source env/bin/activate
-pip install -r requirements.txt
+pip install -e .

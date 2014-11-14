@@ -3,7 +3,6 @@
 import glob
 import logging
 import os
-import re
 import shutil
 import uuid
 import unittest
@@ -12,8 +11,8 @@ from httmock import urlmatch, HTTMock
 import requests
 import yaml
 
-import harprofiler
-import haruploader
+from harprofiler import harprofiler
+from harprofiler import haruploader
 
 
 # Override logging level for tests
@@ -26,26 +25,32 @@ for log in loggers:
     log.setLevel(logging.WARNING)
 
 
+TEST_CONFIG = test_config_file = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    'test_config.yaml'
+)
+
+
 class ProfilerTest(unittest.TestCase):
 
     def test_label_prefix(self):
         url = 'https://www.edx.org/'
         expected_label = 'testprefix-https-www-edx-org'
-        config = yaml.load(file('test_config.yaml'))
+        config = yaml.load(file(TEST_CONFIG))
         profiler = harprofiler.HarProfiler(config, url)
         self.assertEqual(profiler.label, expected_label)
 
     def test_cached_label_prefix(self):
         url = 'https://www.edx.org/'
         expected_label = 'testprefix-https-www-edx-org-cached'
-        config = yaml.load(file('test_config.yaml'))
+        config = yaml.load(file(TEST_CONFIG))
         profiler = harprofiler.HarProfiler(config, url)
         self.assertEqual(profiler.cached_label, expected_label)
 
     def test_blank_label_prefix(self):
         url = 'https://www.edx.org/'
         expected_label = 'https-www-edx-org-cached'
-        config = yaml.load(file('test_config.yaml'))
+        config = yaml.load(file(TEST_CONFIG))
         config['label_prefix'] = None
         profiler = harprofiler.HarProfiler(config, url)
         self.assertEqual(profiler.cached_label, expected_label)
@@ -53,7 +58,7 @@ class ProfilerTest(unittest.TestCase):
     def test_slugify_simple_url(self):
         url = 'https://www.edx.org/'
         expected_slug = 'https-www-edx-org'
-        config = yaml.load(file('test_config.yaml'))
+        config = yaml.load(file(TEST_CONFIG))
         profiler = harprofiler.HarProfiler(config, url)
         slug = profiler.slugify(url)
         self.assertEqual(slug, expected_slug)
@@ -61,13 +66,13 @@ class ProfilerTest(unittest.TestCase):
     def test_slugify_complex_url(self):
         url = 'https://www.edx.org/course/mitx/foo-2881#.VE6swYWFuR9'
         expected_slug = 'https-www-edx-org-course-mitx-foo-2881-ve6swywfur9'
-        config = yaml.load(file('test_config.yaml'))
+        config = yaml.load(file(TEST_CONFIG))
         profiler = harprofiler.HarProfiler(config, url)
         slug = profiler.slugify(url)
         self.assertEqual(slug, expected_slug)
 
     def test_default_config(self):
-        cfg = yaml.load(file('test_config.yaml'))
+        cfg = yaml.load(file(TEST_CONFIG))
         self.assertEqual(
             cfg['browsermob_dir'],
             './browsermob-proxy-2.0-beta-9'
@@ -80,7 +85,7 @@ class ProfilerTest(unittest.TestCase):
 
 class HarFileTestCase(unittest.TestCase):
     def setUp(self):
-        self.config = yaml.load(file('test_config.yaml'))
+        self.config = yaml.load(file(TEST_CONFIG))
         self.test_dir = self.config['har_dir']
         os.makedirs(self.test_dir)
         self.addCleanup(self.remove_hars)
@@ -91,7 +96,7 @@ class HarFileTestCase(unittest.TestCase):
 
 class AcceptanceTest(HarFileTestCase):
     def test_main(self):
-        harprofiler.main('test_config.yaml')
+        harprofiler.main(TEST_CONFIG)
         num_urls = len(self.config['urls'])
         num_pageloads = num_urls * 2  # uncached and cached
         num_hars = len(glob.glob(os.path.join(self.test_dir, '*.har')))
