@@ -121,6 +121,7 @@ class HarProfiler:
             self._save_har(har, cached=True)
 
         driver.quit()
+        proxy.close()
 
     def slugify(self, text):
         pattern = re.compile(r'[^a-z0-9]+')
