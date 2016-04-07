@@ -17,6 +17,7 @@ import re
 import textwrap
 import time
 import yaml
+import io
 
 from browsermobproxy import Server
 from pyvirtualdisplay import Display
@@ -94,8 +95,10 @@ class HarProfiler:
             har_name = self.cached_har_name
 
         log.info('saving HAR file: {}'.format(har_name))
-        with open(os.path.join(self.har_dir, har_name), 'w') as f:
-            json.dump(har, f, indent=2, ensure_ascii=False)
+        with io.open(os.path.join(self.har_dir, har_name),
+                     'w', encoding='utf8') as f:
+            f.write(unicode(json.dumps(har, f,
+                                       indent=2, ensure_ascii=False)))
 
     def _login(self, driver):
         log.info('logging in...')
